@@ -178,7 +178,7 @@ namespace Life
          * Когда у бактерии 100 HP и меньше 20 голода, она ищет партнера для размножения.
          * Поиск заключается в перемещении к ближайшей бактерии своего цвета.
          * Поиск продолжается до тех пор, пока у бактерии не будет голод 20.
-         * После размножения появляется от 0 до 3 новых бактерий.
+         * После размножения появляется от 1 до 3 новых бактерий.
          * Бактерии-родители истощаются (-50 HP) и могут умереть.
          */
         public int MoveLove(Bactery bact)
@@ -238,9 +238,9 @@ namespace Life
 
         static void ViewMap(char[,] map)
         {
-            for (byte i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
-                for (byte j = 0; j < m; j++)
+                for (int j = 0; j < m; j++)
                     Console.Write(map[i, j]);
                 Console.WriteLine();
             }
@@ -248,8 +248,8 @@ namespace Life
 
         static char[,] InitMap(char[,] map)
         {
-            for (byte i = 0; i < n; i++)
-                for (byte j = 0; j < m; j++)
+            for (int i = 0; i < n; i++)
+                for (int j = 0; j < m; j++)
                     map[i, j] = ' ';
             return map;
         }
@@ -257,9 +257,9 @@ namespace Life
         static Bactery[] DeleteBact(Bactery[] bact)
         {
             byte len = 0;
-            for (byte j = 0; j < bact.Length; j++ )
+            for (int j = 0; j < bact.Length; j++ )
             {
-                for (byte i = 0; i < bact.Length - 1; i++)
+                for (int i = 0; i < bact.Length - 1; i++)
                 {
                     if (bact[i].color == ' ' && bact[i + 1].color != ' ')
                     {
@@ -269,13 +269,13 @@ namespace Life
                     }
                 }
             }
-            for (byte i = 0; i < bact.Length; i++)
+            for (int i = 0; i < bact.Length; i++)
             {
                 if (bact[i].color == ' ')
                     len++;
             }
             Bactery[] bact_new = new Bactery[bact.Length - len];
-            for (byte i = 0; i < bact_new.Length; i++)
+            for (int i = 0; i < bact_new.Length; i++)
             {
                 bact_new[i] = bact[i];
             }
@@ -284,10 +284,10 @@ namespace Life
 
         static Bactery[] LoveBact(Bactery[] bact, Random rnd)
         {
-            byte i_love = 0, j_love = 0;
-            for (byte i = 0; i < bact.Length; i++)
+            int i_love = 0, j_love = 0;
+            for (int i = 0; i < bact.Length; i++)
             {
-                for (byte j = 0; j < bact.Length; j++)
+                for (int j = 0; j < bact.Length; j++)
                 {
                     if (i != j && bact[i].coord_X == bact[j].coord_X && bact[i].coord_Y == bact[j].coord_Y)
                     {
@@ -296,7 +296,7 @@ namespace Life
                     }
                 }
             }
-            byte len = (byte)bact.Length;
+            int len = bact.Length;
             bact[i_love].HP -= 50;
             if (bact[i_love].HP < 0)
             {
@@ -313,19 +313,19 @@ namespace Life
                 len--;
             }
 
-            Bactery[] new_bact = new Bactery[len + rnd.Next(4)];
+            Bactery[] new_bact = new Bactery[len + rnd.Next(3) + 1];
 
             bact.CopyTo(new_bact, 0);
 
             byte x = 0, y = 0;
-            for (byte i = len; i < new_bact.Length; i++)
+            for (int i = len; i < new_bact.Length; i++)
             {
                 y = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
-                x = (byte)(bact[i_love].coord_Y + (rnd.Next(10) == 0 ? rnd.Next(10) : -rnd.Next(10)));
+                x = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
                 while (x >= m || y >= n)
                 {
                     y = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
-                    x = (byte)(bact[i_love].coord_Y + (rnd.Next(10) == 0 ? rnd.Next(10) : -rnd.Next(10)));
+                    x = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
                 }
                 new_bact[i] = new Bactery(rnd, y, x);
             }
@@ -338,22 +338,22 @@ namespace Life
             char[,] map = new char[n,m];
 
             InitMap(map);
-            Console.WriteLine("Программа Жизнь v.1.0.21.1887beta");
-            Console.WriteLine("Для начала, введите положительное число бактерий для симмуляции, но учтите:\r\nесли их будет больше 50, корректность симуляции не гарантируется.");
+            Console.WriteLine("Программа Жизнь v.1.0.23.1911beta");
+            Console.WriteLine("Для начала, введите положительное число бактерий для симмуляции, но учтите:\r\nесли их будет много, корректность симуляции и должная скорость работы не гарантируются.");
             Console.WriteLine("Каждая бактерия обладает базовыми инстинктами, такими как голод и желание\r\nпродолжать свой род, которым старается следовать.");
             Console.Write("Введите число бактерий: ");
-            byte numb = Convert.ToByte(Console.ReadLine());
+            int numb = Convert.ToInt32(Console.ReadLine());
 
             Bactery[] bact = new Bactery[numb];
 
-            for (byte i = 0; i < bact.Length; i++)
+            for (int i = 0; i < bact.Length; i++)
             {
                 bact[i] = new Bactery(n, m, rnd);
                 if (map[bact[i].coord_Y, bact[i].coord_X] == '1' || map[bact[i].coord_Y, bact[i].coord_X] == '0')
                     i--;
             }
 
-            for (byte i = 0; i < bact.Length; i++)
+            for (int i = 0; i < bact.Length; i++)
                 map[bact[i].coord_Y, bact[i].coord_X] = bact[i].color;
 
             Console.Clear();
@@ -365,12 +365,13 @@ namespace Life
             //Основной цикл программы
             do
             {
-                for (byte i = 0; i < bact.Length; i++)
+                for (int i = 0; i < bact.Length; i++)
                 {
                     if (bact[i].HP == 100 && bact[i].hunger < 20)
                     {
-                        byte D1, D2, min = 128, sqrt, k = 0;
-                        for (byte j = 0; j < bact.Length; j++)
+                        byte D1, D2, min = 128, sqrt;
+                        int k = 0;
+                        for (int j = 0; j < bact.Length; j++)
                         {
                             if (i != j && bact[i].color == bact[j].color)
                             {
@@ -403,8 +404,9 @@ namespace Life
                     else
                     {
                         bool flag = false;
-                        byte D1, D2, min=128, sqrt, k=0;
-                        for (byte j = 0; j < bact.Length; j++)
+                        byte D1, D2, min = 127, sqrt;
+                        int k = 0;
+                        for (int j = 0; j < bact.Length; j++)
                         {
                             if (i != j && bact[i].color != bact[j].color)
                             {
@@ -432,8 +434,8 @@ namespace Life
                         map[bact[i].coord_Y, bact[i].coord_X] = bact[i].color;
                     }
                 }
-                byte summary = 0;
-                for (byte i = 0; i < bact.Length; i++)
+                int summary = 0;
+                for (int i = 0; i < bact.Length; i++)
                 {
                     if (bact[i].HP < 0 || bact[i].color == ' ')
                     {
@@ -460,7 +462,7 @@ namespace Life
                 it++;
 
                 if (flag_s && flag_h)
-                    for (byte i = 0; i < bact.Length; i++)
+                    for (int i = 0; i < bact.Length; i++)
                     {
                         Console.WriteLine("Бактерия " + (i + 1) + " x=" + bact[i].coord_X + " y=" + bact[i].coord_Y + " Голод=" + bact[i].hunger + " HP=" + bact[i].HP + " Вид=\'" + bact[i].color + "\' Статус:" + bact[i].status);
                     }
