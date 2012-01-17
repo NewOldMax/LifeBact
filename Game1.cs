@@ -31,228 +31,237 @@ namespace Life
 
     class Bactery
     {
-        public byte HP, hunger;
-        public int coord_X, coord_Y;
-        public char color;
-        public string status;
-        public Sprites sprite;
-        /*
-         * Новая бактерия будет иметь 100 HP, случайный голод не более 50,
-         * случайный цвет (1 или 0) и случайные координаты.
-         */
+        public int HP, Hunger, HungerLimit, HPLimit;
+        public int Coord_X, Coord_Y;
+        public char Color;
+        public string Status;
+        public Sprites Sprite;
+        public int LVL;
+        public int Speed;
+
+        //Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
+        //Бактерия будет создана в пределах координат x=20, y=20. Порог HP=100.
         public Bactery(Random rnd)
         {
+            Speed = rnd.Next(3) + 1;
+            LVL = 1;
             HP = 100;
-            hunger = (byte)rnd.Next(50);
-            coord_X = rnd.Next(20);
-            coord_Y = rnd.Next(20);
-            color = (rnd.Next(2) == 1 ? '1' : '0');
-            sprite = new Sprites();
+            HPLimit = 100;
+            Hunger = rnd.Next(50);
+            HungerLimit = rnd.Next(70, 100);
+            Coord_X = rnd.Next(20);
+            Coord_Y = rnd.Next(20);
+            Color = (rnd.Next(2) == 1 ? '1' : '0');
+            Sprite = new Sprites();
+            Status = "Рождение";
+            ChekCoord();
         }
+
+        //Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
+        //Бактерия будет создана в пределах координат x=m, y=n. Порог HP=100.
         public Bactery(int n, int m, Random rnd)
         {
+            Speed = rnd.Next(3) + 1;
+            LVL = 1;
             HP = 100;
-            hunger = (byte)rnd.Next(50);
-            coord_X = rnd.Next(m);
-            coord_Y = rnd.Next(n);
-            color = (rnd.Next(2) == 1 ? '1' : '0');
-            sprite = new Sprites();
+            HPLimit = 100;
+            Hunger = rnd.Next(50);
+            HungerLimit = rnd.Next(70, 100);
+            Coord_X = rnd.Next(m);
+            Coord_Y = rnd.Next(n);
+            Color = (rnd.Next(2) == 1 ? '1' : '0');
+            Sprite = new Sprites();
+            ChekCoord();
         }
-        public Bactery(Random rnd, byte y, byte x)
+
+        //Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
+        //Бактерия будет создана в координатах x=x, y=y. Порог HP=100.
+        public Bactery(Random rnd, int y, int x)
         {
+            Speed = rnd.Next(3) + 1;
+            LVL = 1;
             HP = 100;
-            hunger = (byte)rnd.Next(50);
-            coord_X = x;
-            coord_Y = y;
-            color = (rnd.Next(2) == 1 ? '1' : '0');
-            sprite = new Sprites();
+            HPLimit = 100;
+            Hunger = rnd.Next(50);
+            HungerLimit = rnd.Next(70, 100);
+            Coord_X = x;
+            Coord_Y = y;
+            Color = (rnd.Next(2) == 1 ? '1' : '0');
+            Sprite = new Sprites();
+            ChekCoord();
         }
-        /*
-         * При поглощении другой бактерии, бактерия-охотник утоляет
-         * свой голод в размере HP бактерии-жертвы, деленному на 2.
-         */
-        private int Eat(byte HP_eat)
+
+        //Создание новой бактерии 10/20 уровня (200/300 HP) со случайным голодом (до 10) и случайным порогом голода (70-100).
+        //Бактерия будет создана в координатах x=x, y=y. Порог HP=200/300.
+        public Bactery(Random rnd, int y, int x, char ch)
         {
-            hunger -= (byte)(HP_eat / 2);
-            if (hunger < 0) hunger = 0;
-            status = "Ем";
-            return hunger;
+            if (ch == '2')
+            {
+                LVL = 10;
+                HP = 200;
+                HPLimit = 200;
+                Speed = 2;
+            }
+            else
+            {
+                LVL = 20;
+                HP = 300;
+                HPLimit = 300;
+                Speed = 1;
+            }
+            Hunger = rnd.Next(10);
+            HungerLimit = rnd.Next(70, 100);
+            Coord_X = x;
+            Coord_Y = y;
+            Color = ch;
+            Sprite = new Sprites();
+            ChekCoord();
         }
-        /*
-         * При движении бактерия будет голодать на -1 в каждый момент времени.
-         * Вектор движения выбирается случайным образом.
-         * Также у нее будет восстанавливаться HP на +1 в каждый момент времени,
-         * если голод ниже 20.
-         * Если голод достигает отметки 70, то бактерия теряет голод/10 HP HP в каждый момент
-         * времени (70: -7, 80: -8, 90: -9, 100: -10 и т.д.).
-         * Будет и метод, заставляющий передвигаться бактерию к указанной точке.
-         */
+
+        //Проверка выхода за пределы карты.
+        private void ChekCoord()
+        {
+            if (Coord_X < 0)
+                Coord_X = 1;
+            if (Coord_Y < 0)
+                Coord_Y = 1;
+            if (Coord_X > 600)
+                Coord_X = 599;
+            if (Coord_Y > 600)
+                Coord_Y = 599;
+        }
+        
+        //Поедание бактерии с целью утоления голода.
+        private int Eat(int HP_eat)
+        {
+            Hunger -= HP_eat;
+            if (Hunger < 0) Hunger = 0;
+            HP += HP_eat / 2;
+            if (HP > HPLimit)
+                HP = HPLimit;
+            Status = "Ем";
+            return Hunger;
+        }
+        
+        //Проверка голода бактерии и соответствующие действия с ее HP.
         private int HungerMove()
         {
-            if (hunger < 20 && HP < 100)
+            if (Hunger < ((HungerLimit/100)*80) && HP < HPLimit)
             {
                 HP++;
-                hunger++;
+                Hunger++;
             }
-            else if (hunger < 70)
+            else if (Hunger < HungerLimit)
             {
-                hunger++;
+                Hunger++;
             }
-            else if (hunger >= 70)
+            else if (Hunger >= HungerLimit)
             {
-                if (hunger / 10 > HP)
+                HP--;
+                if (HP <= 0)
                 {
                     HP = 0;
-                    color = ' ';
+                    Color = ' ';
+                }
+                Hunger++;
+            }
+            return 1;
+        }
+
+        //Движение в случайном направлении.
+        public int Move(Random rnd)
+        {
+            Status = "Гуляю";
+            Coord_X += (rnd.Next(10) % 2 == 0 ? 1 : -1) * Speed;
+            Coord_Y += (rnd.Next(10) % 2 == 0 ? 1 : -1) * Speed;
+            ChekCoord();
+            HungerMove();  
+            return 1;
+        }
+        
+        //Движение к ближайшей бактерии при охоте/размножении.
+        public int MoveToBact(Bactery bact, byte Action)
+        {
+            Status = (Action == 0 ? "Охочусь" : "Ищу партнера");
+            int D1 = Math.Abs(Coord_X - bact.Coord_X);
+            int D2 = Math.Abs(Coord_Y - bact.Coord_Y);
+            if (D1 != 0 && D2 != 0)
+            {
+                if (bact.Coord_X > Coord_X && bact.Coord_Y > Coord_Y)
+                {
+                    Coord_X++;
+                    Coord_Y++;
+                }
+                else if (bact.Coord_X < Coord_X && bact.Coord_Y > Coord_Y)
+                {
+                    Coord_X--;
+                    Coord_Y++;
+                }
+                else if (bact.Coord_X < Coord_X && bact.Coord_Y < Coord_Y)
+                {
+                    Coord_X--;
+                    Coord_Y--;
+                }
+                else if (bact.Coord_X > Coord_X && bact.Coord_Y < Coord_Y)
+                {
+                    Coord_X++;
+                    Coord_Y--;
+                }
+                HungerMove();
+            }
+            else if (D1 == 0 && D2 != 0)
+            {
+                if (bact.Coord_Y > Coord_Y) Coord_Y++;
+                else Coord_Y--;
+                HungerMove();
+            }
+            else if (D1 != 0 && D2 == 0)
+            {
+                if (bact.Coord_X > Coord_X) Coord_X++;
+                else Coord_X--;
+                HungerMove();
+            }
+            else
+            {
+                if (Action == 0)
+                {
+                    ChekCoord();
+                    Fight(bact);
                 }
                 else
                 {
-                    HP -= (byte)(hunger / 10);
-                    if (HP < 0)
-                    {
-                        HP = 0;
-                        color = ' ';
-                    }
-                    hunger++;
+                    ChekCoord();
+                    return 0;
                 }
             }
+            ChekCoord();
             return 1;
         }
-        public int Move(Random rnd)
-        {
-            coord_X += (rnd.Next(10) % 2 == 0 ? 1 : -1) * rnd.Next(2);
-            coord_Y += (rnd.Next(10) % 2 == 0 ? 1 : -1) * rnd.Next(2);
-            HungerMove();
-            status = "Гуляю";
-            return 1;
-        }
-        /*
-         * Бактерия начинает охоту в тот момент, когда голод достигает 50.
-         * Охота заключается в следовании к ближайшей бактерии иного цвета.
-         */
-        public int Hunt(Bactery bact)
-        {
-            status = "Охочусь";
-            int D1 = Math.Abs(coord_X - bact.coord_X);
-            int D2 = Math.Abs(coord_Y - bact.coord_Y);
-            if (D1 != 0 && D2 != 0)
-            {
-                if (bact.coord_X > coord_X && bact.coord_Y > coord_Y)
-                {
-                    coord_X++;
-                    coord_Y++;
-                }
-                else if (bact.coord_X < coord_X && bact.coord_Y > coord_Y)
-                {
-                    coord_X--;
-                    coord_Y++;
-                }
-                else if (bact.coord_X < coord_X && bact.coord_Y < coord_Y)
-                {
-                    coord_X--;
-                    coord_Y--;
-                }
-                else if (bact.coord_X > coord_X && bact.coord_Y < coord_Y)
-                {
-                    coord_X++;
-                    coord_Y--;
-                }
-                HungerMove();
-            }
-            else if (D1 == 0 && D2 != 0)
-            {
-                if (bact.coord_Y > coord_Y) coord_Y++;
-                else coord_Y--;
-                HungerMove();
-            }
-            else if (D1 != 0 && D2 == 0)
-            {
-                if (bact.coord_X > coord_X) coord_X++;
-                else coord_X--;
-                HungerMove();
-            }
-            else
-            {
-                status = "В битве";
-                Fight(bact);
-            }
-            return 1;
-        }
-        /*
-         * В схватке побеждает та бактерия, у которой больше или HP (при равенстве атакующая бактерия побеждает).
-         * У бактерии-победителя отнимается 30% от HP (потрепали в схватке).
-         */
+
+        //Битва двух бактерий при охоте.
         private int Fight(Bactery bact)
         {
-            status = "В битве";
             if (HP >= bact.HP)
             {
                 Eat(bact.HP);
-                HP -= (byte)((HP / 100) * 30);
-                if (HP < 0)
+                HP -= (HP / 100) * 30;
+                if (HP <= 0)
                 {
                     HP = 0;
-                    color = ' ';
+                    Color = ' ';
+                }
+                else
+                {
+                    LVL++;
+                    HP += HP;
+                    if (HP > HPLimit)
+                        HP = HPLimit;
                 }
                 bact.HP = 0;
-                bact.color = ' ';
+                bact.Color = ' ';
             }
             else
                 bact.Fight(this);
-            return 1;
-        }
-        /*
-         * Когда у бактерии 100 HP и меньше 20 голода, она ищет партнера для размножения.
-         * Поиск заключается в перемещении к ближайшей бактерии своего цвета.
-         * Поиск продолжается до тех пор, пока у бактерии не будет голод 20.
-         * После размножения появляется от 1 до 3 новых бактерий.
-         * Бактерии-родители истощаются (-50 HP) и могут умереть.
-         */
-        public int MoveLove(Bactery bact)
-        {
-            status = "Ищу партнера";
-            int D1 = Math.Abs(coord_X - bact.coord_X);
-            int D2 = Math.Abs(coord_Y - bact.coord_Y);
-            if (D1 != 0 && D2 != 0)
-            {
-                if (bact.coord_X > coord_X && bact.coord_Y > coord_Y)
-                {
-                    coord_X++;
-                    coord_Y++;
-                }
-                else if (bact.coord_X < coord_X && bact.coord_Y > coord_Y)
-                {
-                    coord_X--;
-                    coord_Y++;
-                }
-                else if (bact.coord_X < coord_X && bact.coord_Y < coord_Y)
-                {
-                    coord_X--;
-                    coord_Y--;
-                }
-                else if (bact.coord_X > coord_X && bact.coord_Y < coord_Y)
-                {
-                    coord_X++;
-                    coord_Y--;
-                }
-                HungerMove();
-            }
-            else if (D1 == 0 && D2 != 0)
-            {
-                if (bact.coord_Y > coord_Y) coord_Y++;
-                else coord_Y--;
-                HungerMove();
-            }
-            else if (D1 != 0 && D2 == 0)
-            {
-                if (bact.coord_X > coord_X) coord_X++;
-                else coord_X--;
-                HungerMove();
-            }
-            else
-            {
-                return 0;
-            }
             return 1;
         }
     }
@@ -261,7 +270,6 @@ namespace Life
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-        Sprites red, blue;
 
         static Random rnd = new Random();
 
@@ -269,7 +277,9 @@ namespace Life
 
         char[,] map = new char[n, m];
 
-        Bactery[] Bact = new Bactery[600];
+        List<Bactery> Bact = new List<Bactery>();
+
+        KeyboardState Key = new KeyboardState();
 
         public Game1()
         {
@@ -277,40 +287,44 @@ namespace Life
             graphics.PreferredBackBufferHeight = 600;
             graphics.PreferredBackBufferWidth = 600;
             Content.RootDirectory = "Content";
-
+            
             InitMap(map);
 
-            for (int i = 0; i < Bact.Length; i++)
+            int number = 100;
+
+            for (int i = 0; i < number; i++)
             {
-                Bact[i] = new Bactery(n, m, rnd);
-                if (map[Bact[i].coord_Y, Bact[i].coord_X] == '1' || map[Bact[i].coord_Y, Bact[i].coord_X] == '0')
+                Bact.Add(new Bactery(n, m, rnd));
+                if (map[Bact[i].Coord_Y, Bact[i].Coord_X] == '1' || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '0')
                     i--;
             }
-            for (int i = 0; i < Bact.Length; i++)
+            for (int i = 0; i < Bact.Count; i++)
             {
-                map[Bact[i].coord_Y, Bact[i].coord_X] = Bact[i].color;
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
             }
         }
-
 
         protected override void Initialize()
         {
             base.Initialize();
         }
-
       
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            for (int i = 0; i < Bact.Length; i++)
+            for (int i = 0; i < Bact.Count; i++)
             {
-                if (Bact[i].sprite.spriteTexture == null)
+                if (Bact[i].Sprite.spriteTexture == null && Bact[i].Color != '2' && Bact[i].Color != '3')
                 {
-                    if (Bact[i].color == '0')
-                        Bact[i].sprite.LoadContent(Content, "red");
-                    else
-                        Bact[i].sprite.LoadContent(Content, "blue");
+                    if (Bact[i].Color == '0')
+                        Bact[i].Sprite.LoadContent(Content, "red");
+                    else if (Bact[i].Color == '1')
+                        Bact[i].Sprite.LoadContent(Content, "blue");
                 }
+                else if (Bact[i].Color == '2')
+                    Bact[i].Sprite.LoadContent(Content, "black");
+                else if (Bact[i].Color == '3')
+                    Bact[i].Sprite.LoadContent(Content, "green");
             }
         }
 
@@ -324,98 +338,21 @@ namespace Life
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            if (Bact.Length == 0)
+            if (Bact.Count == 0)
                 this.Exit();
 
-            for (int i = 0; i < Bact.Length; i++)
+            Key = Keyboard.GetState();
+            if (Key.IsKeyDown(Keys.Space))
+                Bact = AddBact(Bact, rnd);
+
+            GameStadeOne(Bact, map);
+            LoadContent();
+            for (int i = 0; i < Bact.Count; i++)
             {
-                if (Bact[i].HP == 100 && Bact[i].hunger < 20)
-                {
-                    int D1, D2, min = 900, sqrt;
-                    int k = 0;
-                    for (int j = 0; j < Bact.Length; j++)
-                    {
-                        if (i != j && Bact[i].color == Bact[j].color)
-                        {
-                            D1 = Math.Abs(Bact[i].coord_X - Bact[j].coord_X);
-                            D2 = Math.Abs(Bact[i].coord_X - Bact[j].coord_X);
-                            if ((sqrt = (int)Math.Sqrt(D1 * D1 + D2 * D2)) < min)
-                            {
-                                min = sqrt;
-                                k = j;
-                            }
-                        }
-                    }
-                    map[Bact[i].coord_Y, Bact[i].coord_X] = ' ';
-                    if (Bact[i].MoveLove(Bact[k]) == 0)
-                    {
-                        Bact = LoveBact(Bact, rnd);
-                    }
-                    map[Bact[i].coord_Y, Bact[i].coord_X] = Bact[i].color;
-                }
-                else if (Bact[i].hunger < 50)
-                {
-                    map[Bact[i].coord_Y, Bact[i].coord_X] = ' ';
-                    Bact[i].Move(rnd);
-                    while (Bact[i].coord_Y >= n || Bact[i].coord_X >= m || Bact[i].coord_Y < 0 || Bact[i].coord_X < 0 || map[Bact[i].coord_Y, Bact[i].coord_X] == '1' || map[Bact[i].coord_Y, Bact[i].coord_X] == '0')
-                    {
-                        Bact[i].Move(rnd);
-                    }
-                    map[Bact[i].coord_Y, Bact[i].coord_X] = Bact[i].color;
-                }
-                else
-                {
-                    bool flag = false;
-                    int D1, D2, min = 900, sqrt;
-                    int k = 0;
-                    for (int j = 0; j < Bact.Length; j++)
-                    {
-                        if (i != j && Bact[i].color != Bact[j].color)
-                        {
-                            D1 = Math.Abs(Bact[i].coord_X - Bact[j].coord_X);
-                            D2 = Math.Abs(Bact[i].coord_X - Bact[j].coord_X);
-                            if ((sqrt = (int)Math.Sqrt(D1 * D1 + D2 * D2)) < min)
-                            {
-                                min = sqrt;
-                                k = j;
-                                flag = true;
-                            }
-                        }
-                    }
-                    map[Bact[i].coord_Y, Bact[i].coord_X] = ' ';
-                    if (flag == true)
-                        Bact[i].Hunt(Bact[k]);
-                    else
-                    {
-                        Bact[i].Move(rnd);
-                        while (Bact[i].coord_Y >= n || Bact[i].coord_X >= m || Bact[i].coord_Y < 0 || Bact[i].coord_X < 0 || map[Bact[i].coord_Y, Bact[i].coord_X] == '1' || map[Bact[i].coord_Y, Bact[i].coord_X] == '0')
-                        {
-                            Bact[i].Move(rnd);
-                        }
-                    }
-                    map[Bact[i].coord_Y, Bact[i].coord_X] = Bact[i].color;
-                }
-            }
-            int summary = 0;
-            for (int i = 0; i < Bact.Length; i++)
-            {
-                if (Bact[i].HP < 0 || Bact[i].color == ' ')
-                {
-                    Bact[i].color = ' ';
-                    summary++;
-                }
-            }
-            if (summary != 0)
-            {
-                Bact = DeleteBact(Bact);
+                Bact[i].Sprite.spritePosition.X = Bact[i].Coord_X;
+                Bact[i].Sprite.spritePosition.Y = Bact[i].Coord_Y;
             }
 
-            LoadContent();
-            for (int i = 0; i < Bact.Length; i++)
-            {
-                Bact[i].sprite.spritePosition.X = Bact[i].coord_X;
-                Bact[i].sprite.spritePosition.Y = Bact[i].coord_Y;
-            }
 
             base.Update(gameTime);
         }
@@ -425,25 +362,90 @@ namespace Life
             GraphicsDevice.Clear(Color.White);
 
             spriteBatch.Begin();
-            for (int i = 0; i < Bact.Length; i++)
+            for (int i = 0; i < Bact.Count; i++)
             {
-                Bact[i].sprite.Draw(spriteBatch);
+                Bact[i].Sprite.Draw(spriteBatch);
             }
             spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
-        static void ViewMap(char[,] map)
+        /////////////////////////////////////////////////////////////
+        //Главный метод первой стадии игры (развитие бактерий)
+        //и его вспомогательные методы.
+        /////////////////////////////////////////////////////////////
+        static void GameStadeOne(List<Bactery> Bact, char[,] map)
         {
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < Bact.Count; i++)
             {
-                for (int j = 0; j < m; j++)
-                    Console.Write(map[i, j]);
-                Console.WriteLine();
-            }
+                IfLVLup(Bact[i]);
+
+                if (IfLove(Bact, i, map) == 0)
+                    if (IfHunt(Bact, i, map) == 0)
+                        IfMove(Bact, i, map);
+
+                Bact = ChekForDelete(Bact);
+            }    
         }
 
+        //Получение расстояния между бактериями.
+        static int GetLine(List<Bactery> Bact, int i, byte Action)
+        {
+            int D1, D2, min = 900, sqrt;
+            int k = 0;
+            for (int j = 0; j < Bact.Count; j++)
+            {
+                if (Action == 1)
+                {
+                    if (i != j && Bact[i].Color == Bact[j].Color)
+                    {
+                        D1 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
+                        D2 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
+                        if ((sqrt = (int)Math.Sqrt(D1 * D1 + D2 * D2)) < min)
+                        {
+                            min = sqrt;
+                            k = j;
+                        }
+                    }
+                }
+                else
+                {
+                    if (i != j && Bact[i].Color != Bact[j].Color)
+                    {
+                        D1 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
+                        D2 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
+                        if ((sqrt = (int)Math.Sqrt(D1 * D1 + D2 * D2)) < min)
+                        {
+                            min = sqrt;
+                            k = j;
+                        }
+                    }
+                }
+            }
+            return k;
+        }
+
+        //Проверка на удаление "отработавших" бактерий.
+        static List<Bactery> ChekForDelete(List<Bactery> bact)
+        {
+            int summary = 0;
+            for (int i = 0; i < bact.Count; i++)
+            {
+                if (bact[i].HP <= 0 || bact[i].Color == ' ')
+                {
+                    bact[i].Color = ' ';
+                    summary++;
+                }
+            }
+            if (summary != 0)
+            {
+                bact = DeleteBact(bact);
+            }
+            return bact;
+        }
+
+        //Первоначальная инициализация карты-маски.
         static char[,] InitMap(char[,] map)
         {
             for (int i = 0; i < n; i++)
@@ -452,83 +454,173 @@ namespace Life
             return map;
         }
 
-        static Bactery[] DeleteBact(Bactery[] bact)
+        //Нахождение "отработавшей" бактерии.
+        static private bool FindEmpty(Bactery bact)
         {
-            byte len = 0;
-            for (int j = 0; j < bact.Length; j++)
-            {
-                for (int i = 0; i < bact.Length - 1; i++)
-                {
-                    if (bact[i].color == ' ' && bact[i + 1].color != ' ')
-                    {
-                        Bactery temp = bact[i];
-                        bact[i] = bact[i + 1];
-                        bact[i + 1] = temp;
-                    }
-                }
-            }
-            for (int i = 0; i < bact.Length; i++)
-            {
-                if (bact[i].color == ' ')
-                    len++;
-            }
-            Bactery[] bact_new = new Bactery[bact.Length - len];
-            for (int i = 0; i < bact_new.Length; i++)
-            {
-                bact_new[i] = bact[i];
-            }
-            return bact_new;
+            if (bact.Color == ' ')
+                return true;
+            else
+                return false;
         }
 
-        static Bactery[] LoveBact(Bactery[] bact, Random rnd)
+        //Удаление бактерии.
+        static List<Bactery> DeleteBact(List<Bactery> bact)
         {
-            int i_love = 0, j_love = 0;
-            for (int i = 0; i < bact.Length; i++)
+            do
             {
-                for (int j = 0; j < bact.Length; j++)
+                bact.RemoveAt(bact.FindIndex(FindEmpty));
+            } while (bact.FindIndex(FindEmpty) != -1);
+            return bact;
+        }
+
+        //Размножение бактерий.
+        static List<Bactery> LoveBact(List<Bactery> bact, Random rnd, int i_love, int j_love)
+        {
+            int new_bact = rnd.Next(3) + 1;
+
+            int count = bact.Count;
+
+            int x = 0, y = 0;
+            for (int i = bact.Count; i < count + new_bact; i++)
+            {
+                y = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
+                x = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
+                while (x >= m || y >= n || x <= 0 || y <= 0)
                 {
-                    if (i != j && bact[i].coord_X == bact[j].coord_X && bact[i].coord_Y == bact[j].coord_Y)
-                    {
-                        i_love = i;
-                        j_love = j;
-                    }
+                    y = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
+                    x = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
+                }
+                if (bact[i_love].LVL < 10)
+                    bact.Add(new Bactery(rnd, y, x));
+                else
+                {
+                    bact.Add(new Bactery(rnd, y, x, bact[i_love].Color));
                 }
             }
-            int len = bact.Length;
+
             bact[i_love].HP -= 50;
-            if (bact[i_love].HP < 0)
+            if (bact[i_love].HP <= 0)
             {
-                bact[i_love].HP = 0;
-                bact[i_love].color = ' ';
-                len--;
+                bact.RemoveAt(i_love);
             }
 
             bact[j_love].HP -= 50;
-            if (bact[j_love].HP < 0)
+            if (bact[j_love].HP <= 0)
             {
-                bact[j_love].HP = 0;
-                bact[j_love].color = ' ';
-                len--;
+                bact.RemoveAt(j_love);
             }
 
-            Bactery[] new_bact = new Bactery[len + rnd.Next(3) + 1];
+            return bact;
+        }
 
-            bact.CopyTo(new_bact, 0);
-
-            byte x = 0, y = 0;
-            for (int i = len; i < new_bact.Length; i++)
+        //Проверка необходимости размножения и само размножение.
+        static int IfLove(List<Bactery> Bact, int i, char[,] map)
+        {
+            if (Bact[i].HP >= ((Bact[i].HPLimit/100)*60) && Bact[i].Hunger < Bact[i].HungerLimit && Bact.Count < 300)
             {
-                y = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
-                x = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
-                while (x >= m || y >= n)
+                int k = GetLine(Bact, i, 1);
+
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
+                if (Bact[i].MoveToBact(Bact[k], 1) == 0)
                 {
-                    y = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
-                    x = (byte)(bact[i_love].coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(10)));
+                    Bact = LoveBact(Bact, rnd, i, k);
                 }
-                new_bact[i] = new Bactery(rnd, y, x);
-            }
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
 
-            return new_bact;
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        //Проверка необходимости охоты и сама охота.
+        static int IfHunt(List<Bactery> Bact, int i, char[,] map)
+        {
+            if (Bact[i].Hunger >= Bact[i].HungerLimit)
+            {
+                bool flag = false;
+
+                int k = GetLine(Bact, i, 0);
+
+                if (k > 0)
+                    flag = true;
+
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
+                if (flag == true)
+                {
+                    Bact[i].MoveToBact(Bact[k], 0);
+                }
+                else
+                {
+                    Bact[i].Move(rnd);
+                    int it = 0;
+                    while (Bact[i].Coord_Y >= n || Bact[i].Coord_X >= m || Bact[i].Coord_Y <= 0 || Bact[i].Coord_X <= 0 || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '1' || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '0')
+                    {
+                        if (it > 10)
+                            break;
+                        Bact[i].Move(rnd);
+                        it++;
+                    }
+                }
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
+
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        //Проверка необходимости эволюции и сама эволюция.
+        static int IfLVLup(Bactery Bact)
+        {
+            if (Bact.LVL >= 3 && Bact.LVL < 5 && (Bact.Sprite.spriteTexture == null || Bact.Sprite.spriteTexture.Width == 3))
+            {
+                Bact.Color = '2';
+                Bact.Speed = 2;
+                return 1;
+            }
+            else if (Bact.LVL >= 5 && (Bact.Sprite.spriteTexture == null || Bact.Sprite.spriteTexture.Width == 6))
+            {
+                Bact.Color = '3';
+                Bact.Speed = 1;
+                return 2;
+            }
+            return 0;
+        }
+
+        //Проверка необходимости погулять и собственно гуляние.
+        static int IfMove(List<Bactery> Bact, int i, char[,] map)
+        {
+            if (Bact[i].Hunger < Bact[i].HungerLimit)
+            {
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
+                Bact[i].Move(rnd);
+                while (Bact[i].Coord_Y >= n || Bact[i].Coord_X >= m || Bact[i].Coord_Y <= 0 || Bact[i].Coord_X <= 0 || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '1' || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '0')
+                {
+                    Bact[i].Move(rnd);
+                }
+                map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        //Добавть еще бактерий
+        static List<Bactery> AddBact(List<Bactery> Bact, Random rnd)
+        {
+                int k = rnd.Next(10, 30);
+                for (int i = 0; i < k; i++)
+                {
+                    Bact.Add(new Bactery(n, m, rnd));
+                }
+                return Bact;
         }
     }
 }
