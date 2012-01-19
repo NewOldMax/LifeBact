@@ -1,4 +1,5 @@
-﻿using System;
+﻿//XNA Framework 4.0
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
@@ -39,8 +40,11 @@ namespace Life
         public int LVL;
         public int Speed;
 
-        //Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
-        //Бактерия будет создана в пределах координат x=20, y=20. Порог HP=100.
+        /// <summary>
+        /// Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
+        /// Бактерия будет создана в пределах координат x=20, y=20. Порог HP=100.
+        /// </summary>
+        /// <param name="rnd">Определяет случайные значения при инициализации.</param>
         public Bactery(Random rnd)
         {
             Speed = rnd.Next(3) + 1;
@@ -57,8 +61,13 @@ namespace Life
             ChekCoord();
         }
 
-        //Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
-        //Бактерия будет создана в пределах координат x=m, y=n. Порог HP=100.
+        /// <summary>
+        /// Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
+        /// Бактерия будет создана в пределах координат x=m, y=n. Порог HP=100.
+        /// </summary>
+        /// <param name="n">Определяет предел координат по оси Y.</param>
+        /// <param name="m">Определяет предел координат по оси X.</param>
+        /// <param name="rnd">Определяет случайные значения при инициализации.</param>
         public Bactery(int n, int m, Random rnd)
         {
             Speed = rnd.Next(3) + 1;
@@ -74,8 +83,13 @@ namespace Life
             ChekCoord();
         }
 
-        //Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
-        //Бактерия будет создана в координатах x=x, y=y. Порог HP=100.
+        /// <summary>
+        /// Создание новой бактерии 1 уровня (100 HP) со случайным голодом (до 50) и случайным порогом голода (70-100).
+        /// Бактерия будет создана в координатах x=x, y=y. Порог HP=100.
+        /// </summary>
+        /// <param name="rnd">Определяет случайные значения при инициализации.</param>
+        /// <param name="y">Определяет положение по оси Y.</param>
+        /// <param name="x"></param>
         public Bactery(Random rnd, int y, int x)
         {
             Speed = rnd.Next(3) + 1;
@@ -91,8 +105,14 @@ namespace Life
             ChekCoord();
         }
 
-        //Создание новой бактерии 10/20 уровня (200/300 HP) со случайным голодом (до 10) и случайным порогом голода (70-100).
-        //Бактерия будет создана в координатах x=x, y=y. Порог HP=200/300.
+        /// <summary>
+        /// Создание новой бактерии 10/20 уровня (200/300 HP) со случайным голодом (до 10) и случайным порогом голода (70-100).
+        /// Бактерия будет создана в координатах x=x, y=y. Порог HP=200/300.
+        /// </summary>
+        /// <param name="rnd">Определяет случайные значения при инициализации.</param>
+        /// <param name="y">Определяет положение по оси Y.</param>
+        /// <param name="x">Определяет положение по оси X.</param>
+        /// <param name="ch">Определяет вид бактерии.</param>
         public Bactery(Random rnd, int y, int x, char ch)
         {
             if (ch == '2')
@@ -118,20 +138,26 @@ namespace Life
             ChekCoord();
         }
 
-        //Проверка выхода за пределы карты.
+        /// <summary>
+        /// Проверка выхода за пределы карты.
+        /// </summary>
         private void ChekCoord()
         {
-            if (Coord_X < 0)
+            if (Coord_X <= 0)
                 Coord_X = 1;
-            if (Coord_Y < 0)
+            if (Coord_Y <= 0)
                 Coord_Y = 1;
-            if (Coord_X > 600)
-                Coord_X = 599;
-            if (Coord_Y > 600)
+            if (Coord_X >= 800)
+                Coord_X = 799;
+            if (Coord_Y >= 600)
                 Coord_Y = 599;
         }
         
-        //Поедание бактерии с целью утоления голода.
+        /// <summary>
+        /// Поедание бактерии с целью утоления голода.
+        /// </summary>
+        /// <param name="HP_eat">HP поедамой бактерии.</param>
+        /// <returns></returns>
         private int Eat(int HP_eat)
         {
             Hunger -= HP_eat;
@@ -143,7 +169,10 @@ namespace Life
             return Hunger;
         }
         
-        //Проверка голода бактерии и соответствующие действия с ее HP.
+        /// <summary>
+        /// Проверка голода бактерии и соответствующие действия с ее HP.
+        /// </summary>
+        /// <returns>1 в случае успешного выполнения.</returns>
         private int HungerMove()
         {
             if (Hunger < ((HungerLimit/100)*80) && HP < HPLimit)
@@ -168,7 +197,11 @@ namespace Life
             return 1;
         }
 
-        //Движение в случайном направлении.
+        /// <summary>
+        /// Движение в случайном направлении.
+        /// </summary>
+        /// <param name="rnd">Определяет направление движения.</param>
+        /// <returns>1 в случае успешного выполнения.</returns>
         public int Move(Random rnd)
         {
             Status = "Гуляю";
@@ -179,7 +212,12 @@ namespace Life
             return 1;
         }
         
-        //Движение к ближайшей бактерии при охоте/размножении.
+        /// <summary>
+        /// Движение к ближайшей бактерии при охоте/размножении.
+        /// </summary>
+        /// <param name="bact">Бактерия, к которой осуществляется движение.</param>
+        /// <param name="Action">Цель движения (0 - охота, 1 - размножение).</param>
+        /// <returns>1 в случае охоты, 0 в случае размножения.</returns>
         public int MoveToBact(Bactery bact, byte Action)
         {
             Status = (Action == 0 ? "Охочусь" : "Ищу партнера");
@@ -189,39 +227,40 @@ namespace Life
             {
                 if (bact.Coord_X > Coord_X && bact.Coord_Y > Coord_Y)
                 {
-                    Coord_X++;
-                    Coord_Y++;
+                    Coord_X += Speed;
+                    Coord_Y += Speed;
                 }
                 else if (bact.Coord_X < Coord_X && bact.Coord_Y > Coord_Y)
                 {
-                    Coord_X--;
-                    Coord_Y++;
+                    Coord_X -= Speed;
+                    Coord_Y += Speed;
                 }
                 else if (bact.Coord_X < Coord_X && bact.Coord_Y < Coord_Y)
                 {
-                    Coord_X--;
-                    Coord_Y--;
+                    Coord_X -= Speed;
+                    Coord_Y -= Speed;
                 }
                 else if (bact.Coord_X > Coord_X && bact.Coord_Y < Coord_Y)
                 {
-                    Coord_X++;
-                    Coord_Y--;
+                    Coord_X += Speed;
+                    Coord_Y -= Speed;
                 }
                 HungerMove();
             }
             else if (D1 == 0 && D2 != 0)
             {
-                if (bact.Coord_Y > Coord_Y) Coord_Y++;
-                else Coord_Y--;
+                if (bact.Coord_Y > Coord_Y) Coord_Y += Speed;
+                else Coord_Y -=Speed;
                 HungerMove();
             }
             else if (D1 != 0 && D2 == 0)
             {
-                if (bact.Coord_X > Coord_X) Coord_X++;
-                else Coord_X--;
+                if (bact.Coord_X > Coord_X) Coord_X += Speed;
+                else Coord_X -= Speed;
                 HungerMove();
             }
-            else
+            else if ((Math.Abs(bact.Coord_X - Coord_X) < Speed && Math.Abs(bact.Coord_Y - Coord_Y) < Speed) || 
+                (Math.Abs(bact.Coord_X - Coord_X) < bact.Speed && Math.Abs(bact.Coord_Y - Coord_Y) < bact.Speed))
             {
                 if (Action == 0)
                 {
@@ -238,7 +277,11 @@ namespace Life
             return 1;
         }
 
-        //Битва двух бактерий при охоте.
+        /// <summary>
+        /// Битва двух бактерий при охоте.
+        /// </summary>
+        /// <param name="bact">Бактерия-противник.</param>
+        /// <returns>1 в случае успешного выполнения.</returns>
         private int Fight(Bactery bact)
         {
             if (HP >= bact.HP)
@@ -272,22 +315,27 @@ namespace Life
         SpriteBatch spriteBatch;
 
         static Random rnd = new Random();
-
-        static int n = 600, m = 600;
-
+        static int n = 600, m = 800;
         char[,] map = new char[n, m];
 
         List<Bactery> Bact = new List<Bactery>();
 
-        KeyboardState Key = new KeyboardState();
+        KeyboardState keyboardState = new KeyboardState();
+
+        Sprites mouse;
+        MouseState mouseState = new MouseState();
+        BoundingBox bbMouse = new BoundingBox();
+        BoundingBox bbMap = new BoundingBox();
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.PreferredBackBufferHeight = 600;
-            graphics.PreferredBackBufferWidth = 600;
+            graphics.PreferredBackBufferHeight = n;
+            graphics.PreferredBackBufferWidth = m;
             Content.RootDirectory = "Content";
-            
+
+            mouse = new Sprites();
+
             InitMap(map);
 
             int number = 100;
@@ -326,6 +374,8 @@ namespace Life
                 else if (Bact[i].Color == '3')
                     Bact[i].Sprite.LoadContent(Content, "green");
             }
+            if (mouse.spriteTexture == null)
+                mouse.LoadContent(Content, "mouse");
         }
 
         protected override void UnloadContent()
@@ -338,12 +388,14 @@ namespace Life
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            if (Bact.Count == 0)
-                this.Exit();
+      //      if (Bact.Count == 0)
+       //         this.Exit();
 
-            Key = Keyboard.GetState();
-            if (Key.IsKeyDown(Keys.Space))
-                Bact = AddBact(Bact, rnd);
+            UpdateMouse();
+
+            keyboardState = Keyboard.GetState();
+            if (keyboardState.IsKeyDown(Keys.Space))
+                Bact = AddRandomBact(Bact, rnd);
 
             GameStadeOne(Bact, map);
             LoadContent();
@@ -366,9 +418,31 @@ namespace Life
             {
                 Bact[i].Sprite.Draw(spriteBatch);
             }
+            mouse.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// Проверка положения курсора мыши и действия при нажатии.
+        /// </summary>
+        protected void UpdateMouse()
+        {
+            mouseState = Mouse.GetState();
+            mouse.spritePosition.X = mouseState.X;
+            mouse.spritePosition.Y = mouseState.Y;
+
+            bbMouse.Min = new Vector3(mouse.spritePosition.X, mouse.spritePosition.Y, 0);
+            bbMouse.Max = new Vector3(mouse.spritePosition.X + mouse.spriteTexture.Width,
+                mouse.spritePosition.Y + mouse.spriteTexture.Height, 0);
+            bbMap.Min = new Vector3(0, 0, 0);
+            bbMap.Max = new Vector3(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, 0);
+
+            if (mouseState.LeftButton == ButtonState.Pressed && bbMouse.Intersects(bbMap))
+            {
+                AddCursorBact(Bact, rnd, mouse);
+            }
         }
 
         /////////////////////////////////////////////////////////////
@@ -383,17 +457,23 @@ namespace Life
 
                 if (IfLove(Bact, i, map) == 0)
                     if (IfHunt(Bact, i, map) == 0)
-                        IfMove(Bact, i, map);
+                        IfMove(Bact, i, map, 0);
 
                 Bact = ChekForDelete(Bact);
             }    
         }
 
-        //Получение расстояния между бактериями.
+        /// <summary>
+        /// Получение расстояния между бактериями.
+        /// </summary>
+        /// <param name="Bact">Список всех бактерий.</param>
+        /// <param name="i">Бактерия, которая ищет ближайшую.</param>
+        /// <param name="Action">Цель поиска (0 - охота, 1 - размножение).</param>
+        /// <returns>Расстояние до ближайшей бактерии.</returns>
         static int GetLine(List<Bactery> Bact, int i, byte Action)
         {
             int D1, D2, min = 900, sqrt;
-            int k = 0;
+            int k = -1;
             for (int j = 0; j < Bact.Count; j++)
             {
                 if (Action == 1)
@@ -401,11 +481,14 @@ namespace Life
                     if (i != j && Bact[i].Color == Bact[j].Color)
                     {
                         D1 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
-                        D2 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
+                        D2 = Math.Abs(Bact[i].Coord_Y - Bact[j].Coord_Y);
                         if ((sqrt = (int)Math.Sqrt(D1 * D1 + D2 * D2)) < min)
                         {
                             min = sqrt;
-                            k = j;
+                            if (min < 100)
+                            {
+                                k = j;
+                            }
                         }
                     }
                 }
@@ -414,11 +497,14 @@ namespace Life
                     if (i != j && Bact[i].Color != Bact[j].Color)
                     {
                         D1 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
-                        D2 = Math.Abs(Bact[i].Coord_X - Bact[j].Coord_X);
+                        D2 = Math.Abs(Bact[i].Coord_Y - Bact[j].Coord_Y);
                         if ((sqrt = (int)Math.Sqrt(D1 * D1 + D2 * D2)) < min)
                         {
                             min = sqrt;
-                            k = j;
+                            if (min < 100)
+                            {
+                                k = j;
+                            }
                         }
                     }
                 }
@@ -426,7 +512,11 @@ namespace Life
             return k;
         }
 
-        //Проверка на удаление "отработавших" бактерий.
+        /// <summary>
+        /// Проверка на удаление "отработавших" бактерий.
+        /// </summary>
+        /// <param name="bact">Список всех бактерий.</param>
+        /// <returns>Новый список всех бактерий.</returns>
         static List<Bactery> ChekForDelete(List<Bactery> bact)
         {
             int summary = 0;
@@ -445,7 +535,11 @@ namespace Life
             return bact;
         }
 
-        //Первоначальная инициализация карты-маски.
+        /// <summary>
+        /// Первоначальная инициализация карты-маски.
+        /// </summary>
+        /// <param name="map">Массив, который будет картой игры.</param>
+        /// <returns>Инициализированный для игры массив.</returns>
         static char[,] InitMap(char[,] map)
         {
             for (int i = 0; i < n; i++)
@@ -454,7 +548,11 @@ namespace Life
             return map;
         }
 
-        //Нахождение "отработавшей" бактерии.
+        /// <summary>
+        /// Нахождение "отработавшей" бактерии.
+        /// </summary>
+        /// <param name="bact">Проверяемая бактерия.</param>
+        /// <returns>"Отработавшая" бактерия.</returns>
         static private bool FindEmpty(Bactery bact)
         {
             if (bact.Color == ' ')
@@ -463,7 +561,11 @@ namespace Life
                 return false;
         }
 
-        //Удаление бактерии.
+        /// <summary>
+        /// Удаление бактерии.
+        /// </summary>
+        /// <param name="bact">Список всех бактерий.</param>
+        /// <returns>Новый список бактерий.</returns>
         static List<Bactery> DeleteBact(List<Bactery> bact)
         {
             do
@@ -473,7 +575,14 @@ namespace Life
             return bact;
         }
 
-        //Размножение бактерий.
+        /// <summary>
+        /// Размножение бактерий.
+        /// </summary>
+        /// <param name="bact">Список всех бактерий.</param>
+        /// <param name="rnd">Определяет случаность значений при создании новых бактерий.</param>
+        /// <param name="i_love">Номер первой бактерии, готовой к размножению.</param>
+        /// <param name="j_love">Номер второй бактерии, готовой к размножению.</param>
+        /// <returns>Новый список бактерий.</returns>
         static List<Bactery> LoveBact(List<Bactery> bact, Random rnd, int i_love, int j_love)
         {
             int new_bact = rnd.Next(3) + 1;
@@ -483,12 +592,12 @@ namespace Life
             int x = 0, y = 0;
             for (int i = bact.Count; i < count + new_bact; i++)
             {
-                y = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
-                x = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
+                y = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(3) : -rnd.Next(3)) + 1;
+                x = bact[i_love].Coord_X + (rnd.Next(2) == 0 ? rnd.Next(3) : -rnd.Next(3)) + 1;
                 while (x >= m || y >= n || x <= 0 || y <= 0)
                 {
-                    y = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
-                    x = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(10) : -rnd.Next(5));
+                    y = bact[i_love].Coord_Y + (rnd.Next(2) == 0 ? rnd.Next(3) : -rnd.Next(3)) + 1;
+                    x = bact[i_love].Coord_X + (rnd.Next(2) == 0 ? rnd.Next(3) : -rnd.Next(3)) + 1;
                 }
                 if (bact[i_love].LVL < 10)
                     bact.Add(new Bactery(rnd, y, x));
@@ -513,21 +622,35 @@ namespace Life
             return bact;
         }
 
-        //Проверка необходимости размножения и само размножение.
+        /// <summary>
+        /// Проверка необходимости размножения и само размножение.
+        /// </summary>
+        /// <param name="Bact">Список всех бактерий.</param>
+        /// <param name="i">Номер бактерии, проверяемой на готовность к размножению.</param>
+        /// <param name="map">Карта-маска игры.</param>
+        /// <returns>1 в случае размножения, иначе 0.</returns>
         static int IfLove(List<Bactery> Bact, int i, char[,] map)
         {
             if (Bact[i].HP >= ((Bact[i].HPLimit/100)*60) && Bact[i].Hunger < Bact[i].HungerLimit && Bact.Count < 300)
             {
                 int k = GetLine(Bact, i, 1);
 
-                map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
-                if (Bact[i].MoveToBact(Bact[k], 1) == 0)
+                if (k > 0)
                 {
-                    Bact = LoveBact(Bact, rnd, i, k);
-                }
-                map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
+                    map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
+                    if (Bact[i].MoveToBact(Bact[k], 1) == 0)
+                    {
+                        Bact = LoveBact(Bact, rnd, i, k);
+                    }
+                    map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
 
-                return 1;
+                    return 1;
+                }
+                else
+                {
+                    IfMove(Bact, i, map, 1);
+                    return 0;
+                }
             }
             else
             {
@@ -535,7 +658,13 @@ namespace Life
             }
         }
 
-        //Проверка необходимости охоты и сама охота.
+        /// <summary>
+        /// Проверка необходимости охоты и сама охота.
+        /// </summary>
+        /// <param name="Bact">Список всех бактерий.</param>
+        /// <param name="i">Номер бактерии, проверяемой на готовность к охоте.</param>
+        /// <param name="map">Карта-маска игры.</param>
+        /// <returns>1 в случае охоты, иначе 0.</returns>
         static int IfHunt(List<Bactery> Bact, int i, char[,] map)
         {
             if (Bact[i].Hunger >= Bact[i].HungerLimit)
@@ -547,26 +676,34 @@ namespace Life
                 if (k > 0)
                     flag = true;
 
-                map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
-                if (flag == true)
+                if (k > 0)
                 {
-                    Bact[i].MoveToBact(Bact[k], 0);
+                    map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
+                    if (flag == true)
+                    {
+                        Bact[i].MoveToBact(Bact[k], 0);
+                    }
+                    else
+                    {
+                        Bact[i].Move(rnd);
+                        int it = 0;
+                        while (Bact[i].Coord_Y >= n || Bact[i].Coord_X >= m || Bact[i].Coord_Y <= 0 || Bact[i].Coord_X <= 0 || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '1' || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '0')
+                        {
+                            if (it > 10)
+                                break;
+                            Bact[i].Move(rnd);
+                            it++;
+                        }
+                    }
+                    map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
+
+                    return 1;
                 }
                 else
                 {
-                    Bact[i].Move(rnd);
-                    int it = 0;
-                    while (Bact[i].Coord_Y >= n || Bact[i].Coord_X >= m || Bact[i].Coord_Y <= 0 || Bact[i].Coord_X <= 0 || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '1' || map[Bact[i].Coord_Y, Bact[i].Coord_X] == '0')
-                    {
-                        if (it > 10)
-                            break;
-                        Bact[i].Move(rnd);
-                        it++;
-                    }
+                    IfMove(Bact, i, map, 1);
+                    return 0;
                 }
-                map[Bact[i].Coord_Y, Bact[i].Coord_X] = Bact[i].Color;
-
-                return 1;
             }
             else
             {
@@ -574,17 +711,23 @@ namespace Life
             }
         }
 
-        //Проверка необходимости эволюции и сама эволюция.
+        /// <summary>
+        /// Проверка необходимости эволюции и сама эволюция.
+        /// </summary>
+        /// <param name="Bact">Бактерия, проверяемая на эволюцию.</param>
+        /// <returns>1 в случае эволюции первого типа, 2 в случае эволюции второго типа, иначе 0.</returns>
         static int IfLVLup(Bactery Bact)
         {
-            if (Bact.LVL >= 3 && Bact.LVL < 5 && (Bact.Sprite.spriteTexture == null || Bact.Sprite.spriteTexture.Width == 3))
+            if (Bact.LVL >= 10 && Bact.LVL < 20 && (Bact.Sprite.spriteTexture == null || Bact.Sprite.spriteTexture.Width == 3))
             {
+                Bact.HP = Bact.HPLimit = 200;
                 Bact.Color = '2';
                 Bact.Speed = 2;
                 return 1;
             }
-            else if (Bact.LVL >= 5 && (Bact.Sprite.spriteTexture == null || Bact.Sprite.spriteTexture.Width == 6))
+            else if (Bact.LVL >= 20 && (Bact.Sprite.spriteTexture == null || Bact.Sprite.spriteTexture.Width == 6))
             {
+                Bact.HP = Bact.HPLimit = 300;
                 Bact.Color = '3';
                 Bact.Speed = 1;
                 return 2;
@@ -592,10 +735,17 @@ namespace Life
             return 0;
         }
 
-        //Проверка необходимости погулять и собственно гуляние.
-        static int IfMove(List<Bactery> Bact, int i, char[,] map)
+        /// <summary>
+        /// Проверка необходимости погулять и собственно гуляние.
+        /// </summary>
+        /// <param name="Bact">Список всех бактерий.</param>
+        /// <param name="i">Номер проверяемой бактерии.</param>
+        /// <param name="map">Карта-маска игры.</param>
+        /// <param name="Force">1 - принудительное "гуляние", 0 - с учетом голода.</param>
+        /// <returns>1 в случае "гуляния" бактерии, иначе 0.</returns>
+        static int IfMove(List<Bactery> Bact, int i, char[,] map, byte Force)
         {
-            if (Bact[i].Hunger < Bact[i].HungerLimit)
+            if (Bact[i].Hunger < Bact[i].HungerLimit || Force == 1)
             {
                 map[Bact[i].Coord_Y, Bact[i].Coord_X] = ' ';
                 Bact[i].Move(rnd);
@@ -612,8 +762,13 @@ namespace Life
             }
         }
 
-        //Добавть еще бактерий
-        static List<Bactery> AddBact(List<Bactery> Bact, Random rnd)
+        /// <summary>
+        /// Добавить 10-30 бактерий 1 уровня на случайные позиции.
+        /// </summary>
+        /// <param name="Bact">Список всех бактерий.</param>
+        /// <param name="rnd">Определяет случайные значения при создании бактерий.</param>
+        /// <returns>Новый список бактерий.</returns>
+        static List<Bactery> AddRandomBact(List<Bactery> Bact, Random rnd)
         {
                 int k = rnd.Next(10, 30);
                 for (int i = 0; i < k; i++)
@@ -621,6 +776,23 @@ namespace Life
                     Bact.Add(new Bactery(n, m, rnd));
                 }
                 return Bact;
+        }
+
+        /// <summary>
+        /// Добавить 10 бактерий 1 уровня на позиции курсора.
+        /// </summary>
+        /// <param name="Bact">Список всех бактерий.</param>
+        /// <param name="rnd">Определяет случайные значения при создании бактерий.</param>
+        /// <param name="mouse">Игровой курсор.</param>
+        /// <returns>Новый список бактерий.</returns>
+        static List<Bactery> AddCursorBact(List<Bactery> Bact, Random rnd, Sprites mouse)
+        {
+            int k = 10;
+            for (int i = 0; i < k; i++)
+            {
+                Bact.Add(new Bactery(rnd, (int)mouse.spritePosition.Y+rnd.Next(5)+10, (int)mouse.spritePosition.X+rnd.Next(5)+10));
+            }
+            return Bact;
         }
     }
 }
