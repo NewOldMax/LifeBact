@@ -17,16 +17,73 @@ namespace Life
         public Texture2D spriteTexture;
         public Vector2 spritePosition;
 
+        public int frameCount;
+        public double timeFrame;
+        public int frame;
+        public double totalElapsed;
+
+        /// <summary>
+        /// Конструктор для простого спрайта.
+        /// </summary>
         public Sprites()
         { }
 
+        /// <summary>
+        /// Конструктор для анимированного спрайта.
+        /// </summary>
+        /// <param name="FrameCount"></param>
+        /// <param name="framesPerSec"></param>
+        public Sprites(int FrameCount, int framesPerSec)
+        {
+            frameCount = FrameCount;
+            timeFrame = (double)1 / framesPerSec;
+            frame = 0;
+            totalElapsed = 0;
+        }
+
+        /// <summary>
+        /// Загрузка спрайта.
+        /// </summary>
+        /// <param name="Content"></param>
+        /// <param name="texture"></param>
         public void LoadContent(ContentManager Content, String texture)
         {
             spriteTexture = Content.Load<Texture2D>(texture);
         }
+
+        /// <summary>
+        /// Рисование простого спрайта.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(spriteTexture, spritePosition, Color.White);
+        }
+
+        /// <summary>
+        /// Анимация спрайта.
+        /// </summary>
+        /// <param name="elapsed"></param>
+        public void UpdateFrame(double elapsed)
+        {
+            totalElapsed += elapsed;
+            if (totalElapsed > timeFrame)
+            {
+                frame++;
+                frame = frame % (frameCount - 1);
+                totalElapsed -= timeFrame;
+            }
+        }
+
+        /// <summary>
+        /// Рисование анимированного спрайта.
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        public void DrawAnimationSprite(SpriteBatch spriteBatch)
+        {
+                int frameWidth = spriteTexture.Width / frameCount;
+                Rectangle rectangle = new Rectangle(frameWidth * frame, 0, frameWidth, spriteTexture.Height);
+                spriteBatch.Draw(spriteTexture, spritePosition, rectangle, Color.White);
         }
     }
 
@@ -327,6 +384,9 @@ namespace Life
         BoundingBox bbMouse = new BoundingBox();
         BoundingBox bbMap = new BoundingBox();
 
+        private bool paused = false;
+        private bool pauseKeyDown = false;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -334,7 +394,7 @@ namespace Life
             graphics.PreferredBackBufferWidth = m;
             Content.RootDirectory = "Content";
 
-            mouse = new Sprites();
+            mouse = new Sprites(20, 50);
 
             InitMap(map);
 
@@ -391,20 +451,26 @@ namespace Life
       //      if (Bact.Count == 0)
        //         this.Exit();
 
+            Pause();
             UpdateMouse();
-
-            keyboardState = Keyboard.GetState();
-            if (keyboardState.IsKeyDown(Keys.Space))
-                Bact = AddRandomBact(Bact, rnd);
-
-            GameStadeOne(Bact, map);
-            LoadContent();
-            for (int i = 0; i < Bact.Count; i++)
+            double elapsed = gameTime.ElapsedGameTime.TotalSeconds;
+            mouse.UpdateFrame(elapsed);  
+            if (paused == false)
             {
-                Bact[i].Sprite.spritePosition.X = Bact[i].Coord_X;
-                Bact[i].Sprite.spritePosition.Y = Bact[i].Coord_Y;
-            }
+                
 
+                keyboardState = Keyboard.GetState();
+                if (keyboardState.IsKeyDown(Keys.Space))
+                    Bact = AddRandomBact(Bact, rnd);
+
+                GameStadeOne(Bact, map);
+                LoadContent();
+                for (int i = 0; i < Bact.Count; i++)
+                {
+                    Bact[i].Sprite.spritePosition.X = Bact[i].Coord_X;
+                    Bact[i].Sprite.spritePosition.Y = Bact[i].Coord_Y;
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -418,10 +484,24 @@ namespace Life
             {
                 Bact[i].Sprite.Draw(spriteBatch);
             }
-            mouse.Draw(spriteBatch);
+            mouse.DrawAnimationSprite(spriteBatch);
+
             spriteBatch.End();
 
             base.Draw(gameTime);
+        }
+
+        protected void Pause()
+        {
+            if (Keyboard.GetState().IsKeyDown(Keys.P))
+            {
+                pauseKeyDown = true;
+            }
+            else if (pauseKeyDown == true)
+            {
+                pauseKeyDown = false;
+                paused = !paused;
+            }
         }
 
         /// <summary>
@@ -439,7 +519,7 @@ namespace Life
             bbMap.Min = new Vector3(0, 0, 0);
             bbMap.Max = new Vector3(graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight, 0);
 
-            if (mouseState.LeftButton == ButtonState.Pressed && bbMouse.Intersects(bbMap))
+            if (mouseState.LeftButton == ButtonState.Pressed && bbMouse.Intersects(bbMap) && !paused)
             {
                 AddCursorBact(Bact, rnd, mouse);
             }
